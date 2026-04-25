@@ -1,0 +1,710 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pearl Armour AI</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet">
+  <style>
+html, body { height: 100%; margin: 0; }
+* { box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; }
+
+.chat-container { display: flex; flex-direction: column; height: 100%; }
+.messages-area { flex: 1; overflow-y: auto; }
+.msg-enter { animation: msgSlide 0.35s ease-out; }
+@keyframes msgSlide { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pulse-dot { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+.dot1 { animation: pulse-dot 1.2s infinite 0s; }
+.dot2 { animation: pulse-dot 1.2s infinite 0.2s; }
+.dot3 { animation: pulse-dot 1.2s infinite 0.4s; }
+.quick-btn { transition: all 0.2s ease; }
+.quick-btn:hover { transform: translateY(-1px); }
+.cta-glow { box-shadow: 0 0 20px rgba(37, 99, 235, 0.25); transition: box-shadow 0.3s ease; }
+.cta-glow:hover { box-shadow: 0 0 30px rgba(37, 99, 235, 0.4); }
+.scrollbar-thin::-webkit-scrollbar { width: 4px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+@keyframes float-up { 0% { transform: translateY(0px); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-8px); } }
+.float-btn { animation: float-up 0.6s ease-out; backdrop-filter: blur(10px); border: 1px solid rgba(37, 99, 235, 0.3); }
+.float-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(37, 99, 235, 0.25); }
+.header-section { text-align: center; padding: 16px 0; display: flex; align-items: center; justify-content: center; gap: 12px; border-bottom: 1px solid rgba(37, 99, 235, 0.1); }
+.header-section img { height: 32px; width: auto; }
+.header-section h1 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.header-section h1 .gold { color: #fbbf24; }
+.action-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; justify-content: center; padding: 12px; }
+.action-btn { padding: 12px 16px; border-radius: 8px; background: rgba(37, 99, 235, 0.1); border: 1px solid rgba(37, 99, 235, 0.3); color: #38bdf8; font-size: 12px; cursor: pointer; transition: all 0.2s ease; text-align: center; }
+.action-btn:hover { background: rgba(37, 99, 235, 0.2); transform: translateY(-2px); }
+</style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-slate-950 text-white">
+  <div id="app" class="chat-container w-full h-full">
+   <!-- Header -->
+   <header id="header" class="px-4 border-b border-slate-800 bg-slate-950/95 backdrop-blur-sm" style="flex-shrink:0;">
+    <div class="header-section"><img id="headerLogo" src="https://i.ibb.co/BH5JPG1k/Blue-minimalist-building-logo-. -0000.jpg" alt="Pearl Armour Logo" style="height: 32px;">
+     <h1 id="companyTitle" style="font-family:'Playfair Display',serif; font-size: 18px;">PEARL <span class="gold">ARMOUR</span> CONSULTING</h1>
+    </div>
+   </header><!-- Messages -->
+   <div id="messages" class="messages-area scrollbar-thin px-4 py-4 space-y-4">
+   </div><!-- Service Action Buttons (shown after welcome) -->
+   <div id="quickQuestions" class="px-4 pb-4 space-y-3" style="flex-shrink:0;">
+    <div class="action-btns" id="quickBtns"></div>
+   </div><!-- Input -->
+   <div class="px-4 pb-4 pt-2" style="flex-shrink:0;">
+    <form id="chatForm" class="flex gap-2" style="align-items: stretch;"><input id="chatInput" type="text" placeholder="Describe your project or ask a question..." class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors" autocomplete="off"> <button type="submit" class="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white rounded-xl px-5 py-3 flex items-center justify-center transition-colors flex-shrink-0 min-w-[48px] font-medium" style="display: flex; align-items: center; justify-content: center;">
+      <svg width="18" height="18" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><line x1="22" y1="2" x2="11" y2="13"></line> <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg></button>
+    </form>
+   </div><!-- Footer -->
+   <footer class="px-4 py-3 text-center border-t border-slate-800 bg-slate-950/95 text-xs text-slate-500" style="flex-shrink:0;">
+    © Pearl Armour Consulting | Developed by I.TEC GLOBAL
+   </footer>
+  </div><!-- Calculator Modal -->
+  <div id="calculatorModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); z-index:1000; overflow:auto;">
+   <div style="background:#1e293b; max-width:600px; margin:40px auto; padding:20px; border-radius:10px; border:1px solid #38bdf8;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+     <h2 style="margin:0; color:#38bdf8;">🏗️ Engineering Calculator</h2><button onclick="closeCalculator()" style="background:none; border:none; color:#38bdf8; font-size:20px; cursor:pointer;">✕</button>
+    </div><select id="calcType" onchange="updateCalcFields()" style="width:100%; padding:10px; margin:10px 0; border-radius:5px; border:1px solid #38bdf8; background:#0f172a; color:#38bdf8;"> <option value="">Select Tool</option> <option value="pile">Pile Capacity Calculator</option> <option value="beam">Beam Design</option> <option value="slab">Slab Reinforcement</option> <option value="foundation">Foundation Recommender</option> </select>
+    <div id="calcInputs"></div><button onclick="calculateResult()" style="width:100%; padding:10px; margin:10px 0; background:#38bdf8; color:#000; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">Calculate</button>
+    <div id="calcOutput" style="background:#020617; padding:10px; border-radius:5px; margin-top:10px; color:#38bdf8; display:none;"></div>
+   </div>
+  </div>
+  <script>
+const defaultConfig = {
+  company_name: 'Pearl Armour Consulting',
+  tagline: 'Efficient Structures. Solid Foundations.',
+  cta_text: 'Get Professional Advice',
+  whatsapp_link: 'https://wa.link/thkake',
+  bg_color: '#020617',
+  surface_color: '#1e293b',
+  text_color: '#f8fafc',
+  primary_action: '#2563eb',
+  secondary_action: '#334155',
+  font_family: 'DM Sans',
+  font_size: 14
+};
+
+const QUICK_QUESTIONS = [];
+
+function openCalculator() {
+  document.getElementById('calculatorModal').style.display = 'block';
+}
+
+function closeCalculator() {
+  document.getElementById('calculatorModal').style.display = 'none';
+}
+
+function updateCalcFields() {
+  let t = document.getElementById('calcType').value;
+  let i = document.getElementById('calcInputs');
+  i.innerHTML = '';
+  
+  if(t === 'pile') {
+    i.innerHTML = `
+      <input id="area" placeholder="Pile Area (m²)" style="width:100%; padding:10px; margin:10px 0; border-radius:5px; border:1px solid #38bdf8; background:#0f172a; color:#38bdf8;">
+      <input id="end" placeholder="End Bearing (kN/m²)" style="width:100%; padding:10px; margin:10px 0; border-radius:5px; border:1px solid #38bdf8; background:#0f172a; color:#38bdf8;">
+      <input id="friction" placeholder="Skin Friction (kN)" style="width:100%; padding:10px; margin:10px 0; border-radius:5px; border:1px solid #38bdf8; background:#0f172a; color:#38bdf8;">
+    `;
+  } else if(t === 'beam') {
+    i.innerHTML = `
+      <input id="moment" placeholder="Bending Moment (kNm)" style="width:100%; padding:10px; margin:10px 0; border-radius:5px; border:1px solid #38bdf8; background:#0f172a; color:#38bdf8;">
+      <input id="depth" placeholder="Effective Depth (mm)" style="width:100%; padding:10px; margin:10px 0; border-radius:5px; border:1px solid #38bdf8; background:#0f172a; color:#38bdf8;">
+    `;
+  } else if(t === 'slab') {
+    i.innerHTML = `
+      <input id="load" placeholder="Load (kN/m²)" style="width:100%; padding:10px; margin:10px 0; border-radius:5px; border:1px solid #38bdf8; background:#0f172a; color:#38bdf8;">
+      <input id="span" placeholder="Span (m)" style="width:100%; padding:10px; margin:10px 0; border-radius:5px; border:1px solid #38bdf8; background:#0f172a; color:#38bdf8;">
+    `;
+  } else if(t === 'foundation') {
+    i.innerHTML = `
+      <input id="soil" placeholder="Soil Type (soft/medium/hard)" style="width:100%; padding:10px; margin:10px 0; border-radius:5px; border:1px solid #38bdf8; background:#0f172a; color:#38bdf8;">
+      <input id="floors" placeholder="Number of Floors" style="width:100%; padding:10px; margin:10px 0; border-radius:5px; border:1px solid #38bdf8; background:#0f172a; color:#38bdf8;">
+    `;
+  }
+}
+
+function calculateResult() {
+  let t = document.getElementById('calcType').value;
+  let out = document.getElementById('calcOutput');
+  
+  if(!t) { out.textContent = 'Please select a tool'; out.style.display = 'block'; return; }
+  
+  if(t === 'pile') {
+    let A = +document.getElementById('area').value;
+    let Qb = +document.getElementById('end').value;
+    let Qs = +document.getElementById('friction').value;
+    if(!A || !Qb || !Qs) { out.textContent = 'Please fill all fields'; out.style.display = 'block'; return; }
+    let capacity = (A * Qb) + Qs;
+    out.textContent = '✓ Pile Capacity: ' + capacity.toFixed(2) + ' kN';
+  } else if(t === 'beam') {
+    let M = +document.getElementById('moment').value;
+    let d = +document.getElementById('depth').value;
+    if(!M || !d) { out.textContent = 'Please fill all fields'; out.style.display = 'block'; return; }
+    let steel = (M * 1000000) / (0.87 * 500 * d);
+    out.textContent = '✓ Required Steel Area: ' + steel.toFixed(2) + ' mm²';
+  } else if(t === 'slab') {
+    let load = +document.getElementById('load').value;
+    let span = +document.getElementById('span').value;
+    if(!load || !span) { out.textContent = 'Please fill all fields'; out.style.display = 'block'; return; }
+    let steel = (load * span * span) / 8;
+    out.textContent = '✓ Estimated Reinforcement: ' + steel.toFixed(2) + ' kg/m²';
+  } else if(t === 'foundation') {
+    let soil = document.getElementById('soil').value.toLowerCase();
+    let floors = +document.getElementById('floors').value;
+    if(!soil || !floors) { out.textContent = 'Please fill all fields'; out.style.display = 'block'; return; }
+    
+    let result = '';
+    if(soil === 'soft' && floors > 1) {
+      result = '✓ Recommended: Pile Foundation (High Risk Soil)';
+    } else if(soil === 'medium') {
+      result = '✓ Recommended: Raft or Strip Foundation';
+    } else if(soil === 'hard') {
+      result = '✓ Recommended: Shallow Foundation';
+    } else {
+      result = 'More data needed for accurate recommendation';
+    }
+    out.textContent = result;
+  }
+  
+  out.style.display = 'block';
+}
+
+function scrollToService(service) {
+  let msg = '';
+  if(service === 'piling') msg = 'Tell me about piling and deep foundations';
+  else if(service === 'structural') msg = 'What structural design services do you offer?';
+  else if(service === 'geotech') msg = 'Explain geotechnical engineering services';
+  else if(service === 'project') msg = 'What is project management consulting?';
+  sendMessage(msg);
+}
+
+const KNOWLEDGE = {
+  greeting: `Welcome! I'm Pearl Armour AI — your senior engineering advisor.
+
+I help you make **smart, safe, and cost-effective** decisions for your construction projects. Whether it's foundations, structural design, or project planning — I'm here to guide you.
+
+**How can I help you today?**`,
+
+  piling: `🏗️ **PILING & DEEP FOUNDATION SYSTEMS**
+
+Deep foundations are essential when soil conditions are weak or loads are heavy. Here's what you need to know:
+
+**Types of Piles:**
+• **Bored Cast-in-Situ** — Most economical for most soils
+• **Continuous Flight Auger (CFA)** — Fast, minimal vibration
+• **Driven Precast** — Cost-effective for large projects
+• **Screw Piles** — Great for difficult access areas
+
+**Load Transfer:**
+Piles work by either:
+1. **End Bearing** — Resting on hard strata
+2. **Skin Friction** — Gripping surrounding soil
+
+⚠️ **Critical risks to avoid:**
+• Inadequate bore depth → failure
+• Poor concrete mix → loss of capacity
+• Ignoring water table effects → settlement
+• Over-designing → wasted cost
+
+💡 **Cost-saving insight:** Proper SPT testing upfront prevents over-specification and saves 15-25% on foundation costs.
+
+👉 <button onclick="window.open('https://wa.link/thkake', '_blank')" class="float-btn" style="background:#2563eb; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:500; font-size:13px; margin-top:8px;">💬 Chat with Admin</button>`,
+
+  structural: `🏢 **STRUCTURAL DESIGN SERVICES**
+
+Structural design is the backbone of safe, efficient construction. Here's what defines great design:
+
+**Load Analysis:**
+• Dead load (permanent weight)
+• Live load (people, furniture, snow)
+• Wind and seismic forces
+• Environmental factors
+
+**Design Elements:**
+• Beams (horizontal load carriers)
+• Columns (vertical support)
+• Slabs (floor/roof systems)
+• Connections (critical for safety)
+
+**Safety & Efficiency:**
+• Safety factors ensure stability
+• Optimal sizing prevents waste
+• Right materials for the job
+• Future flexibility for changes
+
+⚠️ **Common mistakes:**
+• Over-designing → wasted materials
+• Under-designing → structural risk
+• Ignoring future loads → expensive redesign
+
+💡 **Pearl Armour approach:** We design for safety, efficiency, AND affordability.
+
+👉 <button onclick="window.open('https://wa.link/thkake', '_blank')" class="float-btn" style="background:#2563eb; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:500; font-size:13px; margin-top:8px;">💬 Chat with Admin</button>`,
+
+  geotech: `🌍 **GEOTECHNICAL ENGINEERING SERVICES**
+
+Soil is the foundation of everything. Understanding soil behavior is critical.
+
+**Soil Investigation:**
+• Borehole drilling (reveals soil layers)
+• SPT testing (measures strength)
+• Plate Load Test (settlement prediction)
+• Lab analysis (soil properties)
+
+**What We Analyze:**
+• Bearing capacity (how much load soil can hold)
+• Settlement (how much it will compress)
+• Water table (drainage impact)
+• Soil improvement methods
+
+**Why It Matters:**
+• Wrong foundation → complete failure
+• Improper drainage → flooding
+• Unexpected settlement → cracks
+• Poor design → costly repairs
+
+⚠️ **Warning:** 90% of foundation failures happen because geotechnical data was skipped or ignored.
+
+💰 **Cost perspective:** Geotechnical investigation costs 0.5% of project cost but prevents 20-30% cost overruns.
+
+👉 <button onclick="window.open('https://wa.link/thkake', '_blank')" class="float-btn" style="background:#2563eb; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:500; font-size:13px; margin-top:8px;">💬 Chat with Admin</button>`,
+
+  project: `📋 **PROJECT MANAGEMENT CONSULTING**
+
+Great engineering means nothing without excellent execution. Here's how we manage projects:
+
+**Planning & Scheduling:**
+• Realistic timelines
+• Resource allocation
+• Risk identification
+• Critical path analysis
+
+**Cost Control:**
+• Budget forecasting
+• Value engineering
+• Waste prevention
+• Efficient procurement
+
+**Quality & Supervision:**
+• On-site inspections
+• Materials testing
+• Workmanship standards
+• Compliance checks
+
+**Risk Management:**
+• Delay prevention
+• Safety protocols
+• Change management
+• Contingency planning
+
+⚠️ **Project failure causes:**
+• Poor planning (40%)
+• Inadequate supervision (35%)
+• Unexpected soil conditions (15%)
+• Cost overruns (10%)
+
+💡 **Result of good management:** Projects finish on-time, on-budget, with zero safety incidents.
+
+👉 <button onclick="window.open('https://wa.link/thkake', '_blank')" class="float-btn" style="background:#2563eb; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:500; font-size:13px; margin-top:8px;">💬 Chat with Admin</button>`,
+
+  construction: `🏗️ **GENERAL CONSTRUCTION GUIDANCE**
+
+Construction is where plans become reality. Execution quality determines project success.
+
+**Construction Stages:**
+1. **Site preparation** — Level, drain, mobilize
+2. **Foundation** — Excavation, concrete, tests
+3. **Superstructure** — Columns, beams, slabs
+4. **Finishes** — Walls, surfaces, systems
+
+**Quality Control:**
+• Material testing (concrete strength, steel grade)
+• Workmanship standards (proper placement, curing)
+• Site safety (PPE, protocols, inspections)
+• Documentation (testing reports, certifications)
+
+**Common Mistakes:**
+• Rushing foundation work → settlement
+• Poor concrete curing → low strength
+• Inadequate reinforcement → cracks
+• Skipping inspections → hidden defects
+
+⚠️ **Cost impact:** One week delay can cost 2-3% of project budget.
+
+💡 **Prevention:** Daily inspections, weekly testing, clear quality standards.
+
+👉 <button onclick="window.open('https://wa.link/thkake', '_blank')" class="float-btn" style="background:#2563eb; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:500; font-size:13px; margin-top:8px;">💬 Chat with Admin</button>`,
+
+  professional: `💼 **PROFESSIONAL ENGINEERING SERVICES**
+
+Pearl Armour Consulting brings decades of expertise to every project:
+
+**Our Services:**
+✅ Piling & Deep Foundations — Design & supervision
+✅ Structural Design — Safe, efficient, optimized
+✅ Geotechnical Engineering — Investigation & analysis
+✅ Project Management — End-to-end oversight
+✅ General Construction — Quality execution
+
+**Why Choose Us:**
+• Senior engineers with proven track records
+• Risk-first approach — identify problems early
+• Cost-efficient solutions without corners cut
+• Clear communication in simple language
+• On-site supervision and quality control
+
+**Our Methodology:**
+1. Understand your project fully
+2. Identify all risks upfront
+3. Recommend best approach
+4. Implement with precision
+5. Supervise to completion
+
+👉 <button onclick="window.open('https://wa.link/thkake', '_blank')" class="float-btn" style="background:#2563eb; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:500; font-size:13px; margin-top:8px;">💬 Chat with Admin</button>`,
+
+  cost: `💰 **COST OPTIMIZATION STRATEGIES**
+
+Smart engineering saves money without sacrificing safety. Here's how:
+
+**1. Invest in Proper Investigation**
+→ Avoid costly redesigns mid-construction
+
+**2. Optimize Structural Design**
+→ Right-size beams, columns, foundations
+→ Eliminate over-design waste
+
+**3. Choose Efficient Foundation Type**
+→ Deep vs. shallow (each has cost implications)
+→ Proper selection saves 20-30%
+
+**4. Plan Before You Build**
+→ Clear scheduling prevents idle workers
+→ Good logistics reduce delays
+
+**5. Value Engineering**
+→ Find cheaper alternatives that meet safety
+→ Strategic material selection
+
+**6. Quality Control**
+→ Prevent rework (most expensive cost)
+→ Proper testing catches issues early
+
+⚠️ **Costly mistakes:**
+• Skipping geotechnical report → foundation failure (-50% loss)
+• Poor scheduling → 30% delay cost overrun
+• Mid-construction changes → 15-25% rework cost
+• Low-quality materials → premature failure
+
+💡 **Pearl Armour philosophy:** "The cheapest project is the one done right the first time."
+
+👉 <button onclick="window.open('https://wa.link/thkake', '_blank')" class="float-btn" style="background:#2563eb; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:500; font-size:13px; margin-top:8px;">💬 Chat with Admin</button>`,
+
+  soil_safety: `🔬 **SOIL SAFETY & ASSESSMENT**
+
+A strong project starts from understanding your soil. Here's how we ensure soil safety:
+
+**Testing Methods:**
+• **SPT (Standard Penetration Test)** — Measures bearing capacity
+• **Plate Load Test** — Predicts settlement
+• **Borehole Investigation** — Reveals soil layers
+• **Lab Testing** — Soil properties analysis
+
+**Safety Assessment:**
+✅ Bearing capacity (safe load limits)
+✅ Settlement potential (how much compression)
+✅ Water table impact (drainage concerns)
+✅ Slope stability (if applicable)
+
+**Warning Signs of Unsafe Soil:**
+🚨 Cracks on nearby buildings
+🚨 Waterlogged or swampy terrain
+🚨 Very loose sandy/clayey topsoil
+🚨 Previous building failures nearby
+
+**Risk Levels:**
+• **Hard soil** → Shallow foundations OK
+• **Medium soil** → Strip or raft foundation
+• **Soft soil** → Pile foundation needed
+
+⚠️ **Critical:** Never skip soil investigation. It's the #1 risk factor in construction.
+
+👉 <button onclick="window.open('https://wa.link/thkake', '_blank')" class="float-btn" style="background:#2563eb; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:500; font-size:13px; margin-top:8px;">💬 Chat with Admin</button>`,
+
+  failure_prevention: `🛡️ **PREVENTING FOUNDATION FAILURE**
+
+Foundation failure is every builder's nightmare. But it's 100% preventable. Here's how:
+
+**Top Causes of Failure:**
+1. **Inadequate investigation** (40%) — No soil testing
+2. **Poor design** (30%) — Under-dimensioned
+3. **Water damage** (15%) — Drainage failure
+4. **Construction defects** (10%) — Poor workmanship
+5. **Overloading** (5%) — Adding floors later
+
+**Warning Signs:**
+🚨 Diagonal cracks in walls
+🚨 Doors/windows not closing properly
+🚨 Floor level changes between rooms
+🚨 Visible tilting or settlement
+🚨 Cracks widening over time
+
+**Prevention Strategy:**
+✅ Proper geotechnical investigation
+✅ Professional structural design
+✅ Quality construction supervision
+✅ Regular maintenance inspections
+✅ Early intervention when issues appear
+
+**Cost Comparison:**
+• Prevention cost: 1% of project
+• Remediation cost: 20-50% of project
+• Insurance claim: Often rejected
+
+💡 **Rule:** Address foundation issues immediately—delay makes them exponentially worse.
+
+👉 <button onclick="window.open('https://wa.link/thkake', '_blank')" class="float-btn" style="background:#2563eb; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:500; font-size:13px; margin-top:8px;">💬 Chat with Admin</button>`,
+
+  admin_chat: `💬 **NEED TO CHAT WITH AN EXPERT?**
+
+I'm an AI assistant, but for personalized advice about your specific project, nothing beats talking directly to our engineering team.
+
+**Click the button below to open WhatsApp and chat with our professionals:**
+
+Our team will:
+✅ Answer your specific questions
+✅ Review project details
+✅ Provide custom recommendations
+✅ Schedule site visits if needed
+✅ Prepare detailed proposals
+
+**Available for:**
+• Project consultations
+• Technical discussions
+• Site assessments
+• Proposal requests
+• Emergency support
+
+<button onclick="window.open('https://wa.link/thkake', '_blank')" class="float-btn" style="background:#2563eb; color:white; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-weight:500; font-size:13px; margin-top:12px;">💬 Chat with Admin</button>`
+};
+
+let messages = [];
+let isTyping = false;
+
+function renderQuickBtns() {
+  const c = document.getElementById('quickBtns');
+  c.innerHTML = '';
+  QUICK_QUESTIONS.forEach(q => {
+    const b = document.createElement('button');
+    b.className = 'quick-btn text-xs px-3 py-2 rounded-lg border border-slate-700 bg-slate-800/60 text-slate-300 hover:bg-blue-600/20 hover:border-blue-500/50 hover:text-blue-300 transition-all text-left';
+    b.textContent = q;
+    b.onclick = () => sendMessage(q);
+    c.appendChild(b);
+  });
+}
+
+function formatText(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+function addMessage(role, text) {
+  messages.push({ role, text });
+  const container = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg-enter flex ' + (role === 'user' ? 'justify-end' : 'justify-start');
+
+  if (role === 'user') {
+    div.innerHTML = `<div class="max-w-[80%] bg-blue-600 text-white rounded-2xl rounded-br-md px-4 py-3 text-sm leading-relaxed">${formatText(text)}</div>`;
+  } else {
+    div.innerHTML = `<div class="flex gap-2.5 max-w-[90%]">
+      <div class="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center flex-shrink-0 mt-1">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="bg-slate-800/80 border border-slate-700/50 rounded-2xl rounded-tl-md px-4 py-3 text-sm text-slate-200 leading-relaxed">${formatText(text)}</div>
+    </div>`;
+  }
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showTyping() {
+  isTyping = true;
+  const container = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.id = 'typingIndicator';
+  div.className = 'msg-enter flex justify-start';
+  div.innerHTML = `<div class="flex gap-2.5"><div class="w-7 h-7 rounded-lg bg-blue-600/20 flex items-center justify-center flex-shrink-0 mt-1"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div class="bg-slate-800/80 border border-slate-700/50 rounded-2xl rounded-tl-md px-4 py-3 flex gap-1.5 items-center"><span class="w-2 h-2 rounded-full bg-blue-400 dot1"></span><span class="w-2 h-2 rounded-full bg-blue-400 dot2"></span><span class="w-2 h-2 rounded-full bg-blue-400 dot3"></span></div></div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function hideTyping() {
+  isTyping = false;
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+function getResponse(input) {
+  const l = input.toLowerCase();
+  if (l.includes('piling') || l.includes('deep foundation') || l.includes('pile type')) return KNOWLEDGE.piling;
+  if (l.includes('structural') || l.includes('beam') || l.includes('column') || l.includes('design')) return KNOWLEDGE.structural;
+  if (l.includes('geotech') || l.includes('soil') || l.includes('investigation') || l.includes('borehole') || l.includes('spt')) return KNOWLEDGE.geotech;
+  if (l.includes('project management') || l.includes('scheduling') || l.includes('planning') || l.includes('timeline')) return KNOWLEDGE.project;
+  if (l.includes('construction') || l.includes('workmanship') || l.includes('quality') || l.includes('material')) return KNOWLEDGE.construction;
+  if (l.includes('cost') || l.includes('cheap') || l.includes('budget') || l.includes('save') || l.includes('reduce') || l.includes('optimize')) return KNOWLEDGE.cost;
+  if (l.includes('soil safe') || l.includes('safe soil') || l.includes('testing')) return KNOWLEDGE.soil_safety;
+  if (l.includes('failure') || l.includes('crack') || l.includes('settling') || l.includes('collapse') || l.includes('prevent')) return KNOWLEDGE.failure_prevention;
+  if (l.includes('professional') || l.includes('advice') || l.includes('service') || l.includes('help') || l.includes('chat') || l.includes('consult')) return KNOWLEDGE.admin_chat;
+  
+  return `Thanks for your question! Based on what you've described, here's my perspective as your engineering advisor:
+
+**Key principles I apply:**
+• Always start with proper investigation (soil testing, site assessment)
+• Identify risks before they become problems
+• Design for safety, efficiency, AND cost-effectiveness
+• Supervise construction to ensure quality
+
+⚠️ **Important:** Never skip the fundamentals—proper planning prevents costly problems.
+
+💡 **My recommendation:** Describe your specific project, and I'll give you targeted advice on:
+• Best foundation approach
+• Required investigations
+• Cost-saving opportunities
+• Risk mitigation strategies
+
+**Ready to discuss your project details?**`;
+}
+
+let followUpShown = false;
+
+function showFollowUpBtns() {
+  const qq = document.getElementById('quickQuestions');
+  const btns = document.getElementById('quickBtns');
+  btns.innerHTML = '';
+  const followUps = [
+    "🏗️ Piling & Foundations",
+    "🏢 Structural Design",
+    "🌍 Geotechnical Issues",
+    "📋 Project Management",
+    "💼 Professional Advice",
+    "🧮 PAC Calculator"
+  ];
+  followUps.forEach(q => {
+    const b = document.createElement('button');
+    b.className = 'quick-btn text-xs px-3 py-2 rounded-lg border border-slate-700 bg-slate-800/60 text-slate-300 hover:bg-blue-600/20 hover:border-blue-500/50 hover:text-blue-300 transition-all text-left';
+    b.textContent = q;
+    if (q === "💼 Professional Advice") {
+      b.onclick = () => sendMessage("I'd like professional advice for my project");
+    } else if (q === "🧮 PAC Calculator") {
+      b.onclick = () => openCalculator();
+    } else if (q === "🏗️ Piling & Foundations") {
+      b.onclick = () => sendMessage("Tell me about piling and deep foundations");
+    } else if (q === "🏢 Structural Design") {
+      b.onclick = () => sendMessage("What structural design services do you offer?");
+    } else if (q === "🌍 Geotechnical Issues") {
+      b.onclick = () => sendMessage("Explain geotechnical engineering services");
+    } else if (q === "📋 Project Management") {
+      b.onclick = () => sendMessage("What is project management consulting?");
+    } else {
+      b.onclick = () => sendMessage(q);
+    }
+    btns.appendChild(b);
+  });
+  qq.style.display = 'block';
+}
+
+function sendMessage(text) {
+  if (isTyping || !text.trim()) return;
+  addMessage('user', text.trim());
+  document.getElementById('chatInput').value = '';
+  document.getElementById('quickQuestions').style.display = 'none';
+
+  showTyping();
+  const delay = 600 + Math.random() * 800;
+  setTimeout(() => {
+    hideTyping();
+    const response = getResponse(text);
+    addMessage('assistant', response);
+
+    // Show follow-up buttons after response
+    setTimeout(() => showFollowUpBtns(), 300);
+  }, delay);
+}
+
+function handleCTA() {
+  sendMessage("I'd like professional advice for my project");
+}
+
+document.getElementById('chatForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const input = document.getElementById('chatInput');
+  sendMessage(input.value);
+});
+
+// Init
+renderQuickBtns();
+addMessage('assistant', KNOWLEDGE.greeting);
+setTimeout(() => showFollowUpBtns(), 300);
+
+// Element SDK
+window.elementSdk.init({
+  defaultConfig,
+  onConfigChange: async (config) => {
+    const cf = (k) => config[k] || defaultConfig[k];
+    document.getElementById('companyTitle').innerHTML = 'PEARL <span class="gold">ARMOUR</span>';
+    
+    const bg = cf('bg_color');
+    const surface = cf('surface_color');
+    const txt = cf('text_color');
+    const primary = cf('primary_action');
+    const secondary = cf('secondary_action');
+
+    document.body.style.backgroundColor = bg;
+    document.getElementById('app').style.backgroundColor = bg;
+    document.getElementById('header').style.backgroundColor = bg;
+
+    document.querySelectorAll('.action-btn').forEach(b => {
+      b.style.borderColor = primary + '80';
+      b.style.color = primary;
+    });
+
+    const font = cf('font_family');
+    const baseSize = cf('font_size');
+    const stack = font + ', DM Sans, sans-serif';
+    document.body.style.fontFamily = stack;
+    document.getElementById('companyTitle').style.fontFamily = "'Playfair Display', " + stack;
+    document.body.style.fontSize = baseSize + 'px';
+  },
+  mapToCapabilities: (config) => {
+    const cf = (k) => config[k] || defaultConfig[k];
+    const mut = (key) => ({
+      get: () => cf(key),
+      set: (v) => { config[key] = v; window.elementSdk.setConfig({ [key]: v }); }
+    });
+    return {
+      recolorables: [mut('bg_color'), mut('primary_action')],
+      borderables: [],
+      fontEditable: mut('font_family'),
+      fontSizeable: mut('font_size')
+    };
+  },
+  mapToEditPanelValues: (config) => {
+    const cf = (k) => config[k] || defaultConfig[k];
+    return new Map([
+      ['company_name', cf('company_name')],
+      ['tagline', cf('tagline')],
+      ['cta_text', cf('cta_text')],
+      ['whatsapp_link', cf('whatsapp_link')]
+    ]);
+  }
+});
+
+lucide.createIcons();
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f1d21124065631f',t:'MTc3NzExNzgxNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
